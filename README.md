@@ -1,6 +1,6 @@
 # asbs
 
-=== Files:
+##Files:
 
 EBB-PRU-ADC.dts               device tree overlay source
 EBB-PRU-ADC-00A0.dtbo         device tree overlay blob object (compiled version of .dts file)
@@ -14,7 +14,7 @@ mem2file.c                    source code for capturing data stored in memory
 
 
 
-=== Install Steps:
+##Install Steps:
 
 1.  Deactivate HDMI Overlay, done once:
 see EBB pg 225
@@ -22,7 +22,7 @@ $ sudo nano /bood/uEnv.txt
 
 Uncomment the following line, bu be careful not to uncomment the similar HDMI/eMMC line, or your BBB will not boot from the eMMC:
 
-##Disable HDMI
+ ##Disable HDMI
 optargs=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN
 
 $ sudo shutdown -r now
