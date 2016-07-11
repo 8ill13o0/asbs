@@ -16,8 +16,9 @@ mem2file.c                    source code for capturing data stored in memory
 
 ##Install Steps:
 
-1.  Deactivate HDMI Overlay, done once:
+#(1) Deactivate HDMI Overlay, done once:
 see EBB pg 225
+
 $ sudo nano /bood/uEnv.txt
 
 Uncomment the following line, bu be careful not to uncomment the similar HDMI/eMMC line, or your BBB will not boot from the eMMC:
@@ -38,7 +39,7 @@ The letter "L" means enabled.
 
 
 
-2.  Load Device Tree Overlay, done each reboot:
+#(2) Load Device Tree Overlay, done each reboot:
 
 $ cp EBB-PRU-ADC-00A0.dtbo /lib/firmware/
 $ cd /lib/firmware/
@@ -46,6 +47,4 @@ $ sudo sh -c "echo EBB-PRU-ADC > $SLOTS"
 - or, if $SLOTS env variable not set up -
 $ sudo sh -c "echo EBB-PRU-ADC > /sys/devices/bone_capemgr.9/slots"
 
-2.  
 
-3.  
