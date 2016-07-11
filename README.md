@@ -1,6 +1,6 @@
 # asbs
 
-##Files:
+#Files:
 
 EBB-PRU-ADC.dts               device tree overlay source
 EBB-PRU-ADC-00A0.dtbo         device tree overlay blob object (compiled version of .dts file)
@@ -14,9 +14,9 @@ mem2file.c                    source code for capturing data stored in memory
 
 
 
-##Install Steps:
+#Install Steps:
 
-#(1) Deactivate HDMI Overlay, done once:
+###(1) Deactivate HDMI Overlay, done once:
 see EBB pg 225
 
 $ sudo nano /bood/uEnv.txt
@@ -39,7 +39,7 @@ The letter "L" means enabled.
 
 
 
-#(2) Load Device Tree Overlay, done each reboot:
+###(2) Load Device Tree Overlay, done each reboot:
 
 $ cp EBB-PRU-ADC-00A0.dtbo /lib/firmware/
 $ cd /lib/firmware/
