@@ -11,8 +11,12 @@ PRUADC.p                      PRU program to communicate wtih MCPXXXX family of 
 
 mem2file.c                    source code for capturing data stored in memory
 
+Compile PRUADC.c with:
+$ gcc PRUADCmod.c -o PRUADCmod -lpthread -lprussdrv
 
-
+Compile <name>.p files with:
+$ pasm -b <name>.p
+The "-b" command geneartes a little-endian binary file
 
 #Install Steps:
 
