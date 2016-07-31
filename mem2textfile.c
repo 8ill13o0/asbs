@@ -98,8 +98,7 @@ int main(int argc, char **argv) {
 	virt_addr = map_base + (target & MAP_MASK);
         read_result = *((uint16_t *) virt_addr);
         //printf("Value at address 0x%X (%p): 0x%X\n", target, virt_addr, read_result);
-        //printf("%d %d\n",i, read_result);
-        fwrite(&read_result, sizeof(uint16_t),1,stdout);
+        printf("%d %d\n",i, read_result);
         target+=2;                   // 2 bytes per sample
     }
     fflush(stdout);
