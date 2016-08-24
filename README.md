@@ -18,6 +18,9 @@ Compile <name>.p files with:
 $ pasm -b <name>.p
 The "-b" command geneartes a little-endian binary file
 
+Compile mem2file.c with:
+$ gcc mem2file.c -o mem2file
+
 #Install Steps:
 
 ###(1) Deactivate HDMI Overlay, done once:
