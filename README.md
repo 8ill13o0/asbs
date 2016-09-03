@@ -5,14 +5,13 @@
 EBB-PRU-ADC.dts               device tree overlay source
 EBB-PRU-ADC-00A0.dtbo         device tree overlay blob object (compiled version of .dts file)
 
-PRUADC.c                      source code for loading two PRU programs into PRU-ICSS
+pru12.c                      source code for loading two PRU programs into PRU-ICSS
 PRUClock.p                    PRU program to provide a variable frequency clock on p8_46
 PRUADC.p                      PRU program to communicate wtih MCPXXXX family of SPI ADC ICs
 
-mem2file.c                    source code for capturing data stored in memory
 
-Compile PRUADC.c with:
-$ gcc PRUADCmod.c -o PRUADCmod -lpthread -lprussdrv
+Compile pru12.c with:
+$ gcc pru12.c -o pru12 -lpthread -lprussdrv
 
 Compile <name>.p files with:
 $ pasm -b <name>.p

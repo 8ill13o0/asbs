@@ -147,7 +147,7 @@ int main (void)
    fflush(stdout);
    
 
-   for(iFlush = 1; iFlush <= 8; iFlush++) {
+   for(iFlush = 1; iFlush <= 30; iFlush++) {
 
       virt_addr = map_base + (target & MAP_MASK);
       last_write_addr = *((uint32_t *) virt_addr); //4-byte address
