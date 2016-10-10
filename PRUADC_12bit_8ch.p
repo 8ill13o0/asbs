@@ -20,8 +20,9 @@
 // r7 bit mask
 // r8 "addr" to write to next
 // r9 "size"
-// r10 channel counter, 0 to 7
+// r10 channel counter, 0 to 7, "next-channel-to-write"
 // r11 "addr" not changed
+// r12 2-byte (16 bit) index counter
 
 
 .setcallreg  r29.w2		 // set a non-default CALL/RET register
@@ -49,6 +50,7 @@ START:
     MOV r10, 0 //initialize counter to count through channels 0 to 7
     MOV r2, 0x00000000 // clear r2 to recieve input
     ADD r8, r8, 4 //increment address to save output to by 4 bytes, bytes 0 to 3 are reserved for last written address
+    MOV r12, 0 //initialize index counter
 GET_SAMPLE:			 // load the send value on each sample, increments through channels
     MOV	r5, 0x00010000   // LSB of value at this address is the clock flag
 	MOV r2.w2, 0x0600 // SPI command for CH0
@@ -82,20 +84,27 @@ SPICLK_BIT:                      // loop for each of the 24 bits
 	LSR	r3, r3, 1        // SPICLK shifts left too many times left, shift right once
 	AND	r3, r3, r7	 // AND the data with mask to give only the 12 LSBs
 	//SBBO	r3, r1, 12, 4    // store the data for debugging only -- REMOVE
+WRITE_INDEX:
+	QBNE STORE_DATA, r10, 1 //if "next-channel-to-write" is not 1, don't write index
+	SUB	r9, r9, 2	 // reducing the number of samples - 2 bytes per sample, used to determine when buffer full
+	SBBO	r12.w0, r8, 0, 2	 // store the 2 byte index value r12 in memory
+    SBBO r8, r11, 0, 4 // store r8 4 byte address value at r11 address
+    ADD	r8, r8, 2	 // shifting "next-write-address" by 2 bytes - 2 bytes per sample
+    ADD r12, r12, 1 // increment index counter, doesn't matter that it's a 32-bit counter and I am only using 16 bits
+    QBNE STORE_DATA, r9, 4 // r9 is equal to 4 when memory full
+    ADD r8, r11, 4 // copy r11 to r8 and add 4 bytes to reset buffer
+    LBBO r9, r1, 8, 4 // reset r9, same as line in START
 STORE_DATA:                      // store the sample value in memory
-	SUB	r9, r9, 2	 // reducing the number of samples - 2 bytes per sample
+	SUB	r9, r9, 2	 // reducing the number of samples - 2 bytes per sample, used to determine when buffer full
 	SBBO	r3.w0, r8, 0, 2	 // store the value r3 in memory
     SBBO r8, r11, 0, 4 // store r8 4 byte address value at r11 address
     ADD	r8, r8, 2	 // shifting by 2 bytes - 2 bytes per sample
-    
     // use the following to end after filling buffer:
 	//QBEQ	END, r9, 4       // have taken the full set of samples when r9 is equal to 4
-
     // use the following to write continuously:
 	QBNE SAMPLE_WAIT_LOW, r9, 4 // r9 is equal to 4 when memory full
     ADD r8, r11, 4 // copy r11 to r8 and add 4 bytes to reset buffer
     LBBO r9, r1, 8, 4 // reset r9, same as line in START
-
 SAMPLE_WAIT_LOW:                 // need to wait here if the sample clock has not gone low
 	LBBO	r6, r5, 0, 4	 // load the value in PRU1 sample clock address r5 into r6
 	QBNE	SAMPLE_WAIT_LOW, r6, 0 // wait until the sample clock goes low (just in case)

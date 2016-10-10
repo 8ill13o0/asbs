@@ -126,7 +126,7 @@ int main (void)
    unsigned int addr = readFileValue(MMAP1_LOC "addr");
    unsigned int size = readFileValue(MMAP1_LOC "size");
    off_t target = addr;
-   unsigned int offsetStart = 4; //not zero, has to skip over first 4 bytes, value is next byte to read
+   unsigned int offsetStart = 0; //This was expected to need to be a nonzero number. TO DO: figure out why this is zero.
    int samples_to_read = 0;
    int bytes_per_sample = 2;
    unsigned int offsetMax = size - bytes_per_sample; //offset of the first byte of the last sample

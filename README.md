@@ -17,9 +17,6 @@ Compile <name>.p files with:
 $ pasm -b <name>.p
 The "-b" command geneartes a little-endian binary file
 
-Compile mem2file.c with:
-$ gcc mem2file.c -o mem2file
-
 #Install Steps:
 
 ###(1) Deactivate HDMI Overlay, done once:
@@ -52,5 +49,9 @@ $ cd /lib/firmware/
 $ sudo sh -c "echo EBB-PRU-ADC > $SLOTS"
 - or, if $SLOTS env variable not set up -
 $ sudo sh -c "echo EBB-PRU-ADC > /sys/devices/bone_capemgr.9/slots"
+
+#To Run:
+$ sudo ./pru12 > output.bin
+
 
 
