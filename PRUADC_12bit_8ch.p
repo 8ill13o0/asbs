@@ -33,8 +33,10 @@
 #define PRU_EVTOUT_0    3        // the event number that is sent back
 
 // Constants from the MCP3208 datasheet 
-#define TIME_CLOCK      24       // T_hi and t_lo = 250ns = 25 instructions (min)
-
+#define TIME_CLOCK      41       // T_hi and t_lo = 250ns, 2 instructions per clock cycle in delay code, 5ns (1/200e6) per instruction = 25 instructions (min)
+								 // 24 seemed to work in initial code testing
+								 // At VDD = 2.7V, data sheet says max clock freq is 1 MHz which would make min clock time 500ns and this should be 50 instructions
+								 // 50 caused fewer samples than expected to be gathered, 41 appears to work well.
 START:
         // Enable the OCP master port -- allows transfer of data to Linux userspace
 	LBCO    r0, C4, 4, 4     // load SYSCFG reg into r0 (use c4 const addr)
@@ -54,28 +56,29 @@ START:
 GET_SAMPLE:			 // load the send value on each sample, increments through channels
     MOV	r5, 0x00010000   // LSB of value at this address is the clock flag
 	MOV r2.w2, 0x0600 // SPI command for CH0
-	QBEQ SAMPLE_WAIT_HIGH, r10, 0 //check if channel 0
+	QBEQ CHANNEL_INCREMENT, r10, 0 //check if channel 0
     MOV r2.w2, 0x0640 // SPI command for CH1
-	QBEQ SAMPLE_WAIT_HIGH, r10, 1 //check if channel 1
+	QBEQ CHANNEL_INCREMENT, r10, 1 //check if channel 1
 	MOV r2.w2, 0x0680 // SPI command for CH2
-	QBEQ SAMPLE_WAIT_HIGH, r10, 2 //check if channel 2
+	QBEQ CHANNEL_INCREMENT, r10, 2 //check if channel 2
 	MOV r2.w2, 0x06C0 // SPI command for CH3
-	QBEQ SAMPLE_WAIT_HIGH, r10, 3 //check if channel 3
+	QBEQ CHANNEL_INCREMENT, r10, 3 //check if channel 3
 	MOV r2.w2, 0x0700 // SPI command for CH4
-	QBEQ SAMPLE_WAIT_HIGH, r10, 4 //check if channel 4
+	QBEQ CHANNEL_INCREMENT, r10, 4 //check if channel 4
 	MOV r2.w2, 0x0740 // SPI command for CH5
-	QBEQ SAMPLE_WAIT_HIGH, r10, 5 //check if channel 5
+	QBEQ CHANNEL_INCREMENT, r10, 5 //check if channel 5
 	MOV r2.w2, 0x0780 // SPI command for CH6
-	QBEQ SAMPLE_WAIT_HIGH, r10, 6 //check if channel 6
+	QBEQ CHANNEL_INCREMENT, r10, 6 //check if channel 6
 	MOV r2.w2, 0x07C0 // SPI command for CH7
+CHANNEL_INCREMENT:  //increment channel and reset write/read counter
+	MOV	r4, 24		 // going to write/read 24 bits (3 bytes), reset counter
+	ADD r10, r10, 1 //increment channel counter
+	QBNE SAMPLE_WAIT_HIGH, r10, 8 // if CH does not equal 8, don't reset
+	MOV r10, 0 // reset channel counter after reaching last channel
 SAMPLE_WAIT_HIGH:		 // wait until the PRU1 sample clock goes high
 	LBBO	r6, r5, 0, 4	 // load the value at address r5 into r6		
 	QBNE	SAMPLE_WAIT_HIGH, r6, 1 // loop until r6 is low
 	CLR	r30.t5		 // set the CS line low (active low)
-	MOV	r4, 24		 // going to write/read 24 bits (3 bytes)
-	ADD r10, r10, 1 //increment channel counter
-	QBNE SPICLK_BIT, r10, 8 // if CH does not equal 8, don't reset
-	MOV r10, 0 // reset channel counter after reaching last channel
 SPICLK_BIT:                      // loop for each of the 24 bits
 	SUB	r4, r4, 1        // count down through the bits
 	CALL	SPICLK           // repeat call the SPICLK procedure until all 24-bits written/read
